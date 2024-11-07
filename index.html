@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Employee Management System</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        .background-container {
+            background-image: url('/images/pro_bg.png');
+            background-size: cover;
+            background-position: center;
+            min-height: 100vh;
+            padding: 50px 0;
+        }
+        .card-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 100px;
+        }
+        .card {
+            width: 250px;
+            margin: 20px;
+            cursor: pointer;
+            text-align: center;
+            border-radius: 10px;
+        }
+        .card-body {
+            padding: 20px;
+        }
+        .admin-page, .crud-page {
+            display: none;
+            margin: 10px;
+            color: white;
+            padding: 20px;
+        }
+        .footer {
+            background-color: white;
+            color: black;
+            padding: 20px;
+            text-align: center;
+        }
+        .footer h4 {
+            margin-bottom: 20px;
+        }
+        .footer form {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        .footer .form-group input,
+        .footer .form-group textarea {
+            width: 100%;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="background-container">
+        <div class="container">
+            <!-- Main Selection Cards -->
+            <div class="card-container">
+                <div class="card bg-primary text-white" onclick="showAdminLogin()">
+                    <div class="card-body">
+                        <h5 class="card-title">Admin</h5>
+                    </div>
+                </div>
+                <div class="card bg-info text-white" onclick="openEmployeeReadAccess()">
+                    <div class="card-body">
+                        <h5 class="card-title">Employee</h5>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admin Login Modal -->
+            <div id="adminLoginModal" class="modal" tabindex="-1" role="dialog">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Admin Login</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="adminLoginForm">
+                                <div class="form-group">
+                                    <input type="text" id="username" class="form-control" placeholder="Username" required>
+                                </div>
+                                <div class="form-group">
+                                    <input type="password" id="password" class="form-control" placeholder="Password" required>
+                                </div>
+                                <button type="button" onclick="adminLogin()" class="btn btn-primary">Login</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admin CRUD Page -->
+            <div id="adminCrudPage" class="crud-page">
+                <h3>Welcome to our Employee Management System! <br>
+                    This intuitive platform empowers administrators to seamlessly create, update, and delete employee records with ease. <br>
+                    Employees can view their profiles and stay updated with the latest information. 
+                    <br>Our system ensures efficient and secure management of employee data, streamlining HR processes for enhanced productivity.</h3>
+                <div class="card-container">
+                    <div class="card bg-success" onclick="location.href='/employees/create'">
+                        <div class="card-body">
+                            <h5 class="card-title">Create</h5>
+                        </div>
+                    </div>
+                    <div class="card bg-warning" onclick="location.href='/employees/view'">
+                        <div class="card-body">
+                            <h5 class="card-title">Read</h5>
+                        </div>
+                    </div>
+                    <div class="card bg-info" onclick="location.href='/employees/update'">
+                        <div class="card-body">
+                            <h5 class="card-title">Update</h5>
+                        </div>
+                    </div>
+                    <div class="card bg-danger" onclick="location.href='/employees/delete'">
+                        <div class="card-body">
+                            <h5 class="card-title">Delete</h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Employee Read-Only Page -->
+            <div id="employeeReadPage" class="admin-page">
+                <h1>Employee Management System - Employee</h1>
+                <div class="card bg-warning" onclick="location.href='/employees/view'">
+                    <div class="card-body">
+                        <h5 class="card-title">Read</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contact Us Footer Section -->
+    <div class="footer">
+        <h4>Contact Us</h4>
+        <form id="contactForm">
+            <div class="form-group">
+                <input type="text" id="contactName" class="form-control" placeholder="Your Name" required>
+            </div>
+            <div class="form-group">
+                <input type="email" id="contactEmail" class="form-control" placeholder="Your Email" required>
+            </div>
+            <div class="form-group">
+                <textarea id="contactMessage" class="form-control" rows="3" placeholder="Your Message" required></textarea>
+            </div>
+            <button type="button" onclick="sendMessage()" class="btn btn-primary">Send Message</button>
+        </form>
+        <h4 id="contactSuccessMessage" style="display: none; color: green; margin-top: 15px;">We received your message and will contact you soon.</h4>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        function showAdminLogin() {
+            $('#adminLoginModal').modal('show');
+        }
+
+        function adminLogin() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            if (username === 'admin' && password === 'admin@123') {
+                $('#adminLoginModal').modal('hide');
+                document.querySelector('.card-container').style.display = 'none';
+                document.getElementById('adminCrudPage').style.display = 'block';
+            } else {
+                alert('Incorrect login credentials.');
+            }
+        }
+
+        function openEmployeeReadAccess() {
+            document.querySelector('.card-container').style.display = 'none';
+            document.getElementById('employeeReadPage').style.display = 'block';
+        }
+
+        function sendMessage() {
+            document.getElementById("contactForm").reset();
+            document.getElementById("contactSuccessMessage").style.display = "block";
+        }
+    </script>
+</body>
+</html>
